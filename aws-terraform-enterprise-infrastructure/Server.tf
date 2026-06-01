@@ -17,7 +17,7 @@ resource "aws_instance" "jenkins_server-1" {
   subnet_id     = aws_subnet.Public-1.id
   #key_name      = "vijay-key-pair"
   vpc_security_group_ids = [aws_security_group.Jenkins_sg.id]
-  user_data = file("userJenkins_data.sh")
+  #user_data = file("user_data.sh")
   associate_public_ip_address = true
 
   tags = {

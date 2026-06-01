@@ -29,4 +29,4 @@ install minikube-linux-amd64 /usr/local/bin/minikube
 # This ensures config files are generated in /home/ec2-user/.kube/
 su - ec2-user -c "minikube start --driver=docker"
 
-echo "================ BOOTSTRAP COMPLETE ================" 
+echo "================ BOOTSTRAP COMPLETE ================"
