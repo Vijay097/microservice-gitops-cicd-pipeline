@@ -15,7 +15,7 @@ pipeline {
         stage('1.5 Run Unit Tests') {
             steps {
                 sh 'pip3 install -r requirements.txt'
-                sh 'pytest test_app.py -v'
+                sh 'python3 -m pytest test_app.py -v'
             }   
         }
         
