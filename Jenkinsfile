@@ -50,8 +50,20 @@ pipeline {
                     "sed -i \\"s|IMAGE_PLACEHOLDER|vijay021097/flask-microservice:${BUILD_NUMBER}|\\" manifests-deployment.yaml",
                     "kubectl apply -f manifests-deployment.yaml",
                     "kubectl rollout status deployment/flask-microservice",
-                    "pkill -f \\"kubectl port-forward\\" || true",
-                    "nohup kubectl port-forward --address 0.0.0.0 svc/flask-service 30005:80 > /dev/null 2>&1 &"
+                    
+                    "echo \\"[Unit]\\" | sudo tee /etc/systemd/system/port-forward.service",
+                    "echo \\"Description=Kubernetes Bridge\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"[Service]\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"Environment=KUBECONFIG=/home/ec2-user/.kube/config\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"ExecStart=/usr/local/bin/kubectl port-forward --address 0.0.0.0 svc/flask-service 30005:80\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"Restart=always\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"User=ec2-user\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"[Install]\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    "echo \\"WantedBy=multi-user.target\\" | sudo tee -a /etc/systemd/system/port-forward.service",
+                    
+                    "sudo systemctl daemon-reload",
+                    "sudo systemctl enable port-forward",
+                    "sudo systemctl restart port-forward"
                   ]'
                 """
             }
