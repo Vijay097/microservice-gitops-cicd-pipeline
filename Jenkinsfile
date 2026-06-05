@@ -37,26 +37,22 @@ pipeline {
         
         stage('3. Deploy to Private Kubernetes Cluster') {
             steps {
-                echo "Deploying to Minikube via AWS SSM..."
-                sh '''
+                echo 'Deploying to Minikube via AWS SSM...'
+                sh """
                 aws ssm send-command \
-                  --targets "Key=tag:Name,Values=WebServer-1,WebServer-2" \
-                  --document-name "AWS-RunShellScript" \
-                  --parameters 'commands=[
-                    "export KUBECONFIG=/home/ec2-user/.kube/config",
-                    "cd /home/ec2-user",
-                    "rm -rf project-files",
-                    "git -C microservice-gitops-cicd-pipeline pull || git clone https://github.com/Vijay097/microservice-gitops-cicd-pipeline.git project-files",
-                    "cd project-files",
-                    
-                    "kubectl apply -f manifests-service.yaml ",
-                    "sed -i \"s|IMAGE_PLACEHOLDER|vijay021097/flask-microservice:'${IMAGE_TAG}'|\" manifests-deployment.yaml",
-                    "kubectl apply -f manifests-deployment.yaml",
-                    
-                    "kubectl rollout status deployment/flask-microservice"
-                  ]'
-                '''
+                    --targets Key=tag:Name,Values=WebServer-1,WebServer-2 \
+                    --document-name AWS-RunShellScript \
+                    --parameters 'commands=[
+                        "export KUBECONFIG=/home/ec2-user/.kube/config",
+                        "cd /home/ec2-user",
+                        "if [ -d project-files ]; then cd project-files && git pull; else git clone https://github.com/Vijay097/microservice-gitops-cicd-pipeline.git project-files && cd project-files; fi",
+                        "kubectl apply -f manifests-service.yaml",
+                        "sed -i \\"s|IMAGE_PLACEHOLDER|vijay021097/flask-microservice:${BUILD_NUMBER}|\\" manifests-deployment.yaml",
+                        "kubectl apply -f manifests-deployment.yaml",
+                        "kubectl rollout status deployment/flask-microservice"
+                    ]'
+                """
             }
-        }
+        }   
     }
 }
